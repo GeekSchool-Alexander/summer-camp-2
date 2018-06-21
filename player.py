@@ -29,12 +29,44 @@ class Player(pg.sprite.Sprite):
 		self.pos += self.vel + self.acc/2  # x = x0 + v + a/2
 		self.rect.center = self.pos
 		
-		if self.rect.left < 0:
-			self.rect.left = 0
-		elif self.rect.right > WINDOW_WIDTH:
-			self.rect.right = WINDOW_WIDTH
+		if self.left < 0:
+			self.left = 0
+		elif self.right > WINDOW_WIDTH:
+			self.right = WINDOW_WIDTH
 		
-		if self.rect.top < 0:
-			self.rect.top = 0
-		elif self.rect.bottom > WINDOW_HEIGHT:
-			self.rect.bottom = WINDOW_HEIGHT
+		if self.top < 0:
+			self.top = 0
+		elif self.bottom > WINDOW_HEIGHT:
+			self.bottom = WINDOW_HEIGHT
+
+	@property
+	def right(self):
+		return self.pos.x + PLAYER_WIDTH/2
+	
+	@right.setter
+	def right(self, x):
+		self.pos.x = x - PLAYER_WIDTH/2
+	
+	@property
+	def left(self):
+		return self.pos.x - PLAYER_WIDTH/2
+	
+	@left.setter
+	def left(self, x):
+		self.pos.x = x + PLAYER_WIDTH/2
+	
+	@property
+	def top(self):
+		return self.pos.y - PLAYER_HEIGHT/2
+	
+	@top.setter
+	def top(self, y):
+		self.pos.y = y + PLAYER_HEIGHT/2
+	
+	@property
+	def bottom(self):
+		return self.pos.y + PLAYER_HEIGHT/2
+	
+	@bottom.setter
+	def bottom(self, y):
+		self.pos.y = y - PLAYER_HEIGHT/2

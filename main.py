@@ -1,5 +1,6 @@
 import pygame as pg
 
+from platform import Platform
 from player import Player
 from settings import *
 
@@ -35,8 +36,15 @@ class Game:
 			
 	def new(self):
 		self.all_sprites = pg.sprite.Group()
+		self.platforms = pg.sprite.Group()
+		
 		self.player = Player(WINDOW_WIDTH/2, WINDOW_HEIGHT/2)
 		self.all_sprites.add(self.player)
+		
+		p = Platform(800, 500)
+		self.all_sprites.add(p)
+		self.platforms.add(p)
+		
 		self.run()
 		
 	def main(self):
