@@ -18,11 +18,7 @@ class Player(pg.sprite.Sprite):
 	def update(self):
 		self.acc = vec(0, PLAYER_GRAVITY)
 		
-		keys = pg.key.get_pressed()
-		if keys[pg.K_LEFT]:
-			self.acc.x = -PLAYER_ACC
-		elif keys[pg.K_RIGHT]:
-			self.acc.x = PLAYER_ACC
+		self.keydown_processing()
 		
 		self.acc -= self.vel * PLAYER_FRICTION
 		self.vel += self.acc  # v = v0 + a*t
@@ -32,12 +28,24 @@ class Player(pg.sprite.Sprite):
 		self.collide_processing()
 		
 		self.rect.center = self.pos
-		
+	
+	def keydown_processing(self):
+		keys = pg.key.get_pressed()
+		if keys[pg.K_LEFT]:
+			self.acc.x = -PLAYER_ACC
+		elif keys[pg.K_RIGHT]:
+			self.acc.x = PLAYER_ACC
+		if keys[pg.K_UP]:
+			self.jump()
+			
+	def jump(self):
+		self.vel.y = -PLAYER_JUMP
 		
 	def collide_processing(self):
-		hit = pg.sprite.spritecollide(self, self.platforms, False)
-		if len(hit):
-			pass
+		hits = pg.sprite.spritecollide(self, self.platforms, False)
+		if hits:
+			platform = hits[0]
+			
 
 	def wall_processing(self):
 		if self.left < 0:
