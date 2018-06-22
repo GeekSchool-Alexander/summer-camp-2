@@ -5,18 +5,18 @@ from settings import *
 
 
 class Player(pg.sprite.Sprite):
-	def __init__(self, x, y):
+	def __init__(self, x, y, platforms):
 		super().__init__()
-		self.image = pg.Surface(PLAYER_SIZE)
-		self.image.fill(RED)
+		self.image = pg.image.load("./images/ball.png")
 		self.rect = self.image.get_rect()
 		self.rect.center = (x, y)
 		self.vel = vec(0, 0)
 		self.acc = vec(0, 0)
 		self.pos = vec(x, y)
+		self.platforms = platforms
 	
 	def update(self):
-		self.acc = vec(0, 0)
+		self.acc = vec(0, PLAYER_GRAVITY)
 		
 		keys = pg.key.get_pressed()
 		if keys[pg.K_LEFT]:
@@ -27,8 +27,19 @@ class Player(pg.sprite.Sprite):
 		self.acc -= self.vel * PLAYER_FRICTION
 		self.vel += self.acc  # v = v0 + a*t
 		self.pos += self.vel + self.acc/2  # x = x0 + v + a/2
+		
+		self.wall_processing()
+		self.collide_processing()
+		
 		self.rect.center = self.pos
 		
+		
+	def collide_processing(self):
+		hit = pg.sprite.spritecollide(self, self.platforms, False)
+		if len(hit):
+			pass
+
+	def wall_processing(self):
 		if self.left < 0:
 			self.left = 0
 		elif self.right > WINDOW_WIDTH:
@@ -38,7 +49,8 @@ class Player(pg.sprite.Sprite):
 			self.top = 0
 		elif self.bottom > WINDOW_HEIGHT:
 			self.bottom = WINDOW_HEIGHT
-
+		
+	
 	@property
 	def right(self):
 		return self.pos.x + PLAYER_WIDTH/2

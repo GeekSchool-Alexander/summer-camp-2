@@ -1,5 +1,6 @@
 import pygame as pg
 
+import levels
 from platform import Platform
 from player import Player
 from settings import *
@@ -38,14 +39,32 @@ class Game:
 		self.all_sprites = pg.sprite.Group()
 		self.platforms = pg.sprite.Group()
 		
-		self.player = Player(WINDOW_WIDTH/2, WINDOW_HEIGHT/2)
+		plts_conf, plr_conf = self.create_level(levels.level1)
+		
+		self.player = Player(*plr_conf, self.platforms)
 		self.all_sprites.add(self.player)
 		
-		p = Platform(800, 500)
-		self.all_sprites.add(p)
-		self.platforms.add(p)
-		
+		for plt in plts_conf:
+			p = Platform(*plt)
+			self.all_sprites.add(p)
+			self.platforms.add(p)
+
 		self.run()
+
+	def create_level(self, lvl):
+		x = y = 0
+		player_config = (0, 0)
+		platforms_config = []
+		for row in lvl:
+			for cell in row:
+				if cell == "-":
+					platforms_config.append((x, y))
+				if cell == "o":
+					player_config = (x, y)
+				x += PLATFORM_WIDTH
+			y += PLATFORM_HEIGHT
+			x = 0
+		return tuple(platforms_config), player_config
 		
 	def main(self):
 		while self.running:
