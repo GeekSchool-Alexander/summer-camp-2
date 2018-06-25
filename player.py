@@ -14,8 +14,10 @@ class Player(pg.sprite.Sprite):
 		self.acc = vec(0, 0)
 		self.pos = vec(x, y)
 		self.platforms = platforms
+		self.on_ground = False
 	
 	def update(self):
+		
 		self.acc = vec(0, PLAYER_GRAVITY)
 		
 		self.keydown_processing()
@@ -39,12 +41,36 @@ class Player(pg.sprite.Sprite):
 			self.jump()
 			
 	def jump(self):
-		self.vel.y = -PLAYER_JUMP
+		if self.on_ground:
+			self.vel.y = -PLAYER_JUMP
 		
 	def collide_processing(self):
+		self.on_ground = False
 		hits = pg.sprite.spritecollide(self, self.platforms, False)
 		if hits:
 			platform = hits[0]
+			
+			collides = set()
+			for side, plat_rect in platform.lines.items():
+				if self.rect.colliderect(plat_rect):
+					collides.add(side)
+			
+			if "top" in collides:
+				self.vel.y = 0
+				self.bottom = platform.top
+				self.on_ground = True
+			elif "bottom" in collides:
+				self.vel.y = 0
+				self.top = platform.bottom
+			elif "left" in collides:
+				self.vel.x = 0
+				self.right = platform.left
+			elif "right" in collides:
+				self.vel.x = 0
+				self.left = platform.right
+			
+				
+			
 			
 
 	def wall_processing(self):
