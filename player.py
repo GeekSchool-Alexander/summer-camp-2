@@ -7,7 +7,17 @@ from settings import *
 class Player(pg.sprite.Sprite):
 	def __init__(self, x, y, platforms):
 		super().__init__()
-		self.image = pg.image.load("./images/ball.png")
+		self.frames = (pg.image.load("./images/ball0.png"),
+		               pg.image.load("./images/ball1.png"),
+		               pg.image.load("./images/ball2.png"),
+		               pg.image.load("./images/ball3.png"),
+		               pg.image.load("./images/ball4.png"),
+		               pg.image.load("./images/ball5.png"),
+		               pg.image.load("./images/ball6.png"),
+		               pg.image.load("./images/ball7.png"))
+		self.current_frame = 0
+		self.last_update = pg.time.get_ticks()
+		self.image = self.frames[self.current_frame]
 		self.rect = self.image.get_rect()
 		self.rect.center = (x, y)
 		self.vel = vec(0, 0)
@@ -30,7 +40,23 @@ class Player(pg.sprite.Sprite):
 		self.collide_processing()
 		
 		self.rect.center = self.pos
-	
+		
+		self.animate()
+		
+	def animate(self):
+		now = pg.time.get_ticks()
+		if now - self.last_update >= PLAYER_ANIMATE_DELAY:
+			self.last_update = now
+			if int(self.vel.x) > 0:
+				self.current_frame += 1
+				if self.current_frame >= len(self.frames):
+					self.current_frame = 0
+			elif int(self.vel.x) < 0:
+				self.current_frame -= 1
+				if self.current_frame < 0:
+					self.current_frame = len(self.frames)-1
+			self.image = self.frames[self.current_frame]
+			
 	def keydown_processing(self):
 		keys = pg.key.get_pressed()
 		if keys[pg.K_LEFT]:
@@ -48,26 +74,25 @@ class Player(pg.sprite.Sprite):
 		self.on_ground = False
 		hits = pg.sprite.spritecollide(self, self.platforms, False)
 		if hits:
-			platform = hits[0]
-			
-			collides = set()
-			for side, plat_rect in platform.lines.items():
-				if self.rect.colliderect(plat_rect):
-					collides.add(side)
+			collides = dict()
+			for platform in hits:
+				for side, plat_rect in platform.lines.items():
+					if self.rect.colliderect(plat_rect):
+						collides[side] = plat_rect
 			
 			if "top" in collides:
 				self.vel.y = 0
-				self.bottom = platform.top
+				self.bottom = collides["top"].top
 				self.on_ground = True
 			elif "bottom" in collides:
 				self.vel.y = 0
-				self.top = platform.bottom
+				self.top = collides["bottom"].bottom
 			elif "left" in collides:
 				self.vel.x = 0
-				self.right = platform.left
+				self.right = collides["left"].left
 			elif "right" in collides:
 				self.vel.x = 0
-				self.left = platform.right
+				self.left = collides["right"].right
 			
 				
 			
