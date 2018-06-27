@@ -36,9 +36,10 @@ class Saw(pg.sprite.Sprite):
 			self.image = self.frames[self.current_frame]
 
 class FlyingSaw(Saw):
-	def __init__(self, x, y, direction):
+	def __init__(self, x, y, direction, platforms):
 		super().__init__(x, y)
 		self.vel = self.generate_speed(direction)
+		self.platforms = platforms
 	
 	def generate_speed(self, direct):
 		if isinstance(direct, str):
@@ -59,5 +60,11 @@ class FlyingSaw(Saw):
 	
 	def update(self):
 		self.animate()
+		self.collide_processing()
 		self.rect.x += self.vel.x
 		self.rect.y += self.vel.y
+	
+	def collide_processing(self):
+		hits = pg.sprite.spritecollide(self, self.platforms, False)
+		if hits:
+			self.vel = -self.vel

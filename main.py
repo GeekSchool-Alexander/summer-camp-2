@@ -11,6 +11,7 @@ class Game:
 	def __init__(self):
 		pg.init()
 		self.screen = pg.display.set_mode(WINDOW_SIZE)
+		pg.display.set_caption("GeekSchool Platformer")
 		self.clock = pg.time.Clock()
 		self.running = True
 	
@@ -19,6 +20,10 @@ class Game:
 			if event.type == pg.QUIT:
 				self.playing = False
 				self.running = False
+			elif event.type == pg.KEYDOWN:
+				if event.key == pg.K_ESCAPE:
+					self.playing = False
+					self.running = False
 	
 	def update(self):
 		self.all_sprites.update()
@@ -41,7 +46,7 @@ class Game:
 		self.platforms = pg.sprite.Group()
 		self.saws = pg.sprite.Group()
 		
-		plts_conf, plr_conf, saw_conf = self.create_level(levels.level1)
+		plts_conf, plr_conf, saw_conf, fl_saw_conf = self.create_level(levels.level1)
 		
 		self.player = Player(*plr_conf, self.platforms)
 		self.all_sprites.add(self.player)
@@ -56,10 +61,10 @@ class Game:
 			self.all_sprites.add(s)
 			self.saws.add(s)
 		
-		# TODO: flying saw generator
-		s = FlyingSaw(0, 40, "right")
-		self.all_sprites.add(s)
-		self.saws.add(s)
+		for fl_saw in fl_saw_conf:
+			s = FlyingSaw(*fl_saw, self.platforms)
+			self.all_sprites.add(s)
+			self.saws.add(s)
 
 		self.run()
 
@@ -68,6 +73,7 @@ class Game:
 		player_config = (0, 0)
 		platforms_config = []
 		saws_config = []
+		flying_saws_config = []
 		for row in lvl:
 			for cell in row:
 				if cell == "-":
@@ -76,10 +82,18 @@ class Game:
 					player_config = (x, y)
 				if cell == "*":
 					saws_config.append((x, y))
+				if cell == "<":
+					flying_saws_config.append((x, y, "left"))
+				if cell == ">":
+					flying_saws_config.append((x, y, "right"))
+				if cell == "^":
+					flying_saws_config.append((x, y, "up"))
+				if cell == "v":
+					flying_saws_config.append((x, y, "down"))
 				x += PLATFORM_WIDTH
 			y += PLATFORM_HEIGHT
 			x = 0
-		return tuple(platforms_config), player_config, tuple(saws_config)
+		return tuple(platforms_config), player_config, tuple(saws_config), tuple(flying_saws_config)
 		
 	def main(self):
 		while self.running:
