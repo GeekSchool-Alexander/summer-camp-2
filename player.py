@@ -1,3 +1,5 @@
+import time
+
 import pygame as pg
 
 from VectorClass import Vec2d as vec
@@ -5,7 +7,7 @@ from settings import *
 
 
 class Player(pg.sprite.Sprite):
-	def __init__(self, x, y, platforms):
+	def __init__(self, x, y, game):
 		super().__init__()
 		self.frames = (pg.image.load("./images/ball0.png"),
 		               pg.image.load("./images/ball1.png"),
@@ -23,7 +25,7 @@ class Player(pg.sprite.Sprite):
 		self.vel = vec(0, 0)
 		self.acc = vec(0, 0)
 		self.pos = vec(x, y)
-		self.platforms = platforms
+		self.game = game
 		self.on_ground = False
 	
 	def update(self):
@@ -71,8 +73,9 @@ class Player(pg.sprite.Sprite):
 			self.vel.y = -PLAYER_JUMP
 		
 	def collide_processing(self):
+		# collide with platforms
 		self.on_ground = False
-		hits = pg.sprite.spritecollide(self, self.platforms, False)
+		hits = pg.sprite.spritecollide(self, self.game.platforms, False)
 		if hits:
 			collides = dict()
 			for platform in hits:
@@ -93,10 +96,18 @@ class Player(pg.sprite.Sprite):
 			elif "right" in collides:
 				self.vel.x = 0
 				self.left = collides["right"].right
-			
 				
+		# collide with saws
+		hits = pg.sprite.spritecollide(self, self.game.saws, False)
+		if hits:
+			time.sleep(1)
+			self.game.playing = False
 			
-			
+		# collide with portal
+		hits = self.rect.colliderect(self.game.portal.rect)
+		if hits:
+			self.game.player_won = True
+			pg.event.post(pg.event.Event(pg.QUIT))
 
 	def wall_processing(self):
 		if self.left < 0:
@@ -109,7 +120,6 @@ class Player(pg.sprite.Sprite):
 		elif self.bottom > WINDOW_HEIGHT:
 			self.bottom = WINDOW_HEIGHT
 		
-	
 	@property
 	def right(self):
 		return self.pos.x + PLAYER_WIDTH/2

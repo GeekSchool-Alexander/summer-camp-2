@@ -1,6 +1,7 @@
 # colors
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
+DARK_GREEN = (0, 150, 0)
 
 # window configuration
 WINDOW_WIDTH = 1000
