@@ -61,16 +61,16 @@ class Player(pg.sprite.Sprite):
 			
 	def keydown_processing(self):
 		keys = pg.key.get_pressed()
-		if keys[pg.K_LEFT]:
+		if keys[pg.K_a]:
 			self.acc.x = -PLAYER_ACC
-		elif keys[pg.K_RIGHT]:
+		elif keys[pg.K_d]:
 			self.acc.x = PLAYER_ACC
-		if keys[pg.K_UP]:
+		if keys[pg.K_w]:
 			self.jump()
 			
 	def jump(self):
 		if self.on_ground:
-			self.vel.y = -PLAYER_JUMP
+			self.acc.y = -PLAYER_JUMP
 		
 	def collide_processing(self):
 		# collide with platforms
